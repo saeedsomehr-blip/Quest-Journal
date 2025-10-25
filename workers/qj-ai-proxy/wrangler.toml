@@ -1,0 +1,11 @@
+name = "qj-ai-proxy"
+main = "src/worker.js"
+compatibility_date = "2024-05-01"
+
+# اخطارها را برطرف می‌کند:
+workers_dev = true
+preview_urls = true
+
+[vars]
+X_TITLE = "Quest Journal"
+HTTP_REFERER = "https://quest-journal.local"

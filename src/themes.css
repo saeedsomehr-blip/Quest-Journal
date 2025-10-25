@@ -1,0 +1,31 @@
+/* =========================
+   Base layout / layering
+   ========================= */
+
+html, body, #root, .app-root { min-height: 100vh; }
+body { background: var(--bg); }
+
+/* محتوای اپ همیشه روی Stage قرار می‌گیرد */
+.app-root {
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+
+/* =========================
+   Safety neutralizer
+   اگر هنوز باقیمانده‌ای از استایل‌های قدیمی وجود داشت،
+   وقتی Stage روشن است، همه pseudo overlayها خاموش شوند.
+   ========================= */
+
+html.stage-on body::before,
+html.stage-on body::after,
+html.stage-on .app-root::before,
+html.stage-on .app-root::after {
+  background: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+  filter: none !important;
+  transform: none !important;
+  mix-blend-mode: normal !important;
+}

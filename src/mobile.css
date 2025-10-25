@@ -1,0 +1,441 @@
+/* =====================================================
+   Quest Journal — Mobile-only (touch + small screens)
+   Stable scroll/tap, symmetric gutters, safe badge
+   ===================================================== */
+
+/* ---------- 1) Touch targets ---------- */
+.is-touch .btn, .is-touch .tab,
+.is-touch input[type="text"], .is-touch input[type="number"],
+.is-touch textarea, .is-touch select{
+  min-height: 44px; padding-block: 10px;
+}
+.is-touch .icon-btn{ min-width: 44px; min-height: 44px; }
+.is-touch .icon-btn.sm{ min-width: 36px; min-height: 36px; }
+.is-touch .task input[type="checkbox"]{ width: 22px; height: 22px; }
+
+/* ---------- 2) Immersive toggle (default hidden) ---------- */
+.immersive-toggle{ display: none; }
+
+/* ---------- 3) Base mobile constraints (latest) ---------- */
+@media (max-width: 900px){
+  html, body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; }
+
+  .theme-stage, .stage {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+  }
+  .theme-stage * , .stage *  { z-index: -1 !important; pointer-events: none !important; }
+
+  .app-root {
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    padding-left: calc(var(--gutter) + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(var(--gutter) + env(safe-area-inset-right, 0px)) !important;
+    box-sizing: border-box;
+  }
+
+  :root{ --gutter: 12px; --card-max: 880px; }
+
+  /* جلوگیری از گَترِ دوبل: گَتر فقط روی .app-root بماند */
+  #root{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-block-start: calc(12px + env(safe-area-inset-top, 0px));
+    box-sizing: border-box;
+  }
+
+  .card{
+    position: relative; width:100%; max-width: var(--card-max); margin-inline:auto;
+    overflow: visible !important; z-index: 20;
+  }
+  .header, .header-top, .brand-left, .char-wrap{ overflow: visible !important; }
+
+  /* --- Tabs (portrait-safe) --- */
+  .top-tabs{
+    position: relative; z-index: 2000 !important;
+    display:flex; flex-wrap:wrap; justify-content:center;
+    gap:10px 12px; margin:8px auto 10px;
+    width: 100% !important;
+    max-width: min(var(--card-max), 100%) !important;
+    box-sizing: border-box !important;
+    padding-inline: 8px;               /* بافر داخلی برای gap */
+    pointer-events:auto !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .top-tabs .tab{
+    height:34px; line-height:34px; padding:0 12px; font-size:13px;
+    flex:0 1 clamp(120px, 30%, 180px); text-align:center;
+    min-width: 0;                       /* جلوگیری از پهن‌شدن به‌خاطر متن */
+    touch-action: manipulation;
+  }
+
+  .card .sf-forest, .card .sf-card, .card .sf-grid{ max-width: 100%; }
+  .sf-grid{ display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+
+  .modal, .modal-body, .modal-tabs { max-width: 100%; overflow: hidden; }
+  .modal *, .settings *, .settings-panel *, .settings-grid * {
+    max-width:100%; min-width:0; overflow-wrap:anywhere; word-break:break-word;
+  }
+  .settings-grid{ display:grid; grid-template-columns:1fr; gap:10px; }
+
+  .challenge-list{
+    max-height: min(50vh, 360px) !important;
+    overflow-y:auto; overflow-x:hidden;
+  }
+  .challenge-list > *{ min-width:0; max-width:100%; }
+  .challenge-card, .challenge-row{ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; }
+  .challenge-card .title, .challenge-row .title{
+    min-width:0; overflow:hidden; text-overflow:ellipsis;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+
+  .app-root .card{ max-width:100% !important; }
+}
+
+/* ---------- 4) Immersive fullscreen (mobile only) ---------- */
+@media (max-width: 900px){
+  .is-touch .immersive-toggle{ display:inline-grid; place-items:center; width:28px; height:28px; }
+  html:has(body.is-immersive){ height:100dvh; overflow:hidden; }
+  body.is-immersive{ overflow:hidden; overscroll-behavior:none; }
+  body.is-immersive .theme-stage, body.is-immersive .stage, body.is-immersive .stage-on{ display:none !important; }
+
+  body.is-immersive .app-root{ padding:0 !important; place-items:stretch; min-height:100dvh; z-index:10; }
+  body.is-immersive .card{
+    position:fixed; inset:0; width:100vw; height:100dvh; margin:0; border:0; border-radius:0; box-shadow:none;
+    padding: clamp(10px, 2.5vw, 14px); z-index:1000;
+    overflow-y:auto !important; overflow-x:visible !important;
+    -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior-y:contain;
+  }
+  body.is-immersive .immersive-toggle{
+    position:fixed; top:calc(env(safe-area-inset-top,0px) + 10px); right:calc(env(safe-area-inset-right,0px) + 10px);
+    z-index:1200; background:rgba(0,0,0,.45); color:#fff; backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.15); border-radius:8px;
+  }
+  body.is-immersive .top-tabs { display:none !important; }
+}
+
+/* ---------- 5) XP overview tweaks ---------- */
+@media (max-width: 600px){
+  .xp-overview{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .xp-overview .xp-pill{ padding: 8px; }
+  .xp-overview .xp-ico{ width: 30px; height: 30px; }
+  .xp-overview .xp-name{ font-size: clamp(11px, 3vw, 12px); }
+  .xp-overview .xp-bar{ height: 4px; }
+  .xp-overview .xp-meta{ font-size: 11px; }
+}
+
+/* ---------- 6) Story grid single-column on very small phones ---------- */
+@media (max-width: 480px){
+  .sf-grid{ grid-template-columns: 1fr; }
+}
+
+/* ---------- 7) Task title clamp ---------- */
+@media (max-width: 600px){
+  /* Subtask menu visibility: prevent clipping by container */
+  .subtask-list{ overflow-x: visible !important; overflow-y: visible !important; }
+  .subtask-list .task .menuWrap{ position: relative; z-index: 300; }
+  .subtask-list .task .task-menu{ z-index: 4000 !important; }
+  /* Keep container visible so menus (absolute) don't get clipped */
+  .task .title{ display: block !important; overflow: visible !important; }
+  /* Clamp only the text wrapper */
+  .task .title-main{
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ---------- 8) Mobile player: hide when NOT playing ---------- */
+@media (max-width: 900px){
+  .global-player:not(.is-playing):not([data-playing="true"]){
+    display: none !important;
+  }
+}
+
+/* ---------- 9) Mobile modal scroll fixes (override) ---------- */
+@media (max-width: 900px){
+  .modal{
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: min(92dvh, 760px) !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+  .modal-body, .modal-tabs{ max-width: 100% !important; overflow: hidden !important; }
+  .modal-backdrop{ overscroll-behavior: contain; touch-action: none; }
+}
+
+/* ---------- 10) Hide global player visually in immersive ---------- */
+@media (max-width: 900px){
+  body.is-immersive .global-player{
+    transform: translateY(-200%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* ---------- 11) Badge positioning with variables (authoritative) ---------- */
+@media (max-width: 900px){
+  .char-wrap{
+    --badge-left: -6px;           /* بیرون‌زدگی افقی دلخواه */
+    --badge-top: 120%;            /* عمودی */
+    --badge-tx: var(--badge-left);/* translateX = همان بیرون‌زدگی */
+    --badge-ty: -50%;
+    --badge-rot: -90deg;
+    --badge-scale: .90;
+    --badge-z: 3000;
+    position: relative; z-index: 200;
+  }
+  .char-wrap .tier-banner{
+    position: absolute !important;
+    left: max(0px, var(--badge-left)) !important; /* هرگز منفی در layout */
+    top:  var(--badge-top)  !important;
+    transform:
+      translate(var(--badge-tx, var(--badge-left)), var(--badge-ty))
+      rotate(var(--badge-rot))
+      scale(var(--badge-scale)) !important;
+    transform-origin: left center !important;
+    z-index: var(--badge-z) !important;
+    pointer-events: none !important;
+    filter: drop-shadow(0 8px 22px rgba(0,0,0,.22));
+  }
+}
+
+/* ---------- 12) نمونه‌های سریع برای تنظیم badge ----------
+.char-wrap{ --badge-left: -10px; }            // بیرون‌تر
+.char-wrap{ --badge-top: 40%; }               // کمی بالاتر
+.char-wrap{ --badge-rot: 0deg; --badge-ty: 0% } // بدون چرخش، هم‌راستا با هدر
+------------------------------------------------------------------ */
+
+/* --- PATCH (mobile): ensure no vw width escapes --- */
+@media (max-width: 900px){
+  .card{
+    width: 100% !important;
+    max-width: min(var(--card-max), 100%) !important;
+  }
+  .top-tabs{
+    width: 100% !important;
+    max-width: min(var(--card-max), 100%) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+.app-root .card {
+  margin-inline: auto !important;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --gutter: 8px; /* کمتر برای گوشی‌های باریک */
+  }
+
+  /* اطمینان از وسط‌چینی کامل */
+  #root, .app-root {
+    padding-left: calc(var(--gutter) + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(var(--gutter) + env(safe-area-inset-right, 0px)) !important;
+    box-sizing: border-box;
+  }
+
+  .app-root .card, .card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+
+  .top-tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+    justify-content: center !important;
+  }
+}
+
+/* --- Fix tiny phones: prevent subtask overflow --- */
+@media (max-width: 480px){
+  /* ظرف‌های محتمل سابتسک */
+  .subtasks, .subtask-list, .child-list, .milestone-list {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* هر ردیف سابتسک باید قابل‌جمع شدن و پیچیدن باشد */
+  .subtask-row, .child-row, .milestone-item {
+    display: flex;
+    flex-wrap: wrap;          /* اجازهٔ رفتن به خط بعد */
+    gap: 6px;                 /* گپ کوچک‌تر برای 320px */
+    align-items: center;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  /* فرزندها اجازهٔ بزرگ‌تر از ظرف نداشته باشن */
+  .subtask-row > *, .child-row > *, .milestone-item > * {
+    min-width: 0 !important;  /* مهم‌ترین خط برای flex overflow */
+    max-width: 100% !important;
+  }
+
+  /* عنوان‌ها باید قابل فشرده‌سازی باشن */
+  .subtask-title, .child-title, .milestone-title {
+    flex: 1 1 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;    /* اگر لازم داری 1 یا 3 کن */
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+  }
+
+  /* گروه دکمه‌ها/آیکن‌ها جمع‌وجور و نشکن */
+  .subtask-actions, .child-actions, .milestone-actions {
+    flex: 0 0 auto;
+    display: inline-flex;
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  /* ورودی‌های با عرض ثابت را adaptive کن */
+  .xp-chip-input, .xpInput, .dueInput, .dueSelect {
+    width: auto !important;
+    min-width: clamp(44px, 18vw, 56px);
+    max-width: 30vw;          /* توی 320px حدوداً ≤96px */
+    text-align: center;
+  }
+
+  /* اگر ادیت inline سابتسک داری */
+  .subtask-editor, .child-editor, .milestone-edit {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* خود تب‌ها را هم مجبور به ظرف‌محوری کن */
+  .top-tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force parent task rows to wrap so subtasks drop below the task */
+  .list:not(.challenge-list) > .task{
+    flex-wrap: wrap;
+    align-items: flex-start; /* avoid vertical centering glitches */
+  }
+  /* Title occupies its own full row for space */
+  .list:not(.challenge-list) > .task > .title{
+    flex: 1 1 100%;
+    min-width: 0 !important;
+  }
+  /* Subtask container sits on a new full-width row */
+  .list:not(.challenge-list) > .task > .subtask-list{
+    flex: 1 1 100%;
+    min-width: 0 !important;
+    width: 100%;
+    order: 10; /* ensure below other inline controls */
+    margin-top: 8px !important;
+  }
+}
+
+/* --- Mobile fix: subtask wrapping for tiny screens (actual DOM selectors) --- */
+@media (max-width: 600px){
+  /* Ensure subtask rows (.task) inside .subtask-list can wrap and shrink */
+  .subtask-list .task{
+    flex-wrap: wrap;
+    align-items: flex-start;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* preserve outer card gutters: avoid shifting content with left margin */
+    margin-left: 0 !important;      /* override inline marginLeft:16 */
+    padding-left: 16px;             /* keep a subtle visual indent */
+    position: relative;             /* create local stacking context for menu */
+    overflow: visible !important;   /* allow menus to overflow rows */
+  }
+  .subtask-list .task > *{
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+  .subtask-list .task .title{
+    flex: 1 1 160px;
+    min-width: 0 !important; /* override inline minWidth */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+  }
+}
+
+/* --- Ultra-small phones: stack subtasks under the task (≤360px) --- */
+@media (max-width: 600px){
+  /* Ensure parent task in main lists wraps so subtasks drop below */
+  .list:not(.challenge-list) > .task{
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  /* Parent title should occupy full row for readability */
+  .list:not(.challenge-list) > .task > .title{
+    flex: 1 1 100%;
+    min-width: 0 !important;
+  }
+  /* Place subtasks on their own line below main row */
+  .list:not(.challenge-list) > .task > .subtask-list{
+    flex: 1 1 100%;
+    min-width: 0 !important;
+    order: 10;                 /* ensure it follows XP/controls */
+    margin-top: 6px !important;
+  }
+
+  /* Inside each subtask row, stack title beneath controls with small font */
+  .subtask-list .task{
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "chk xp menu"
+      "title title title";
+    align-items: center;
+    row-gap: 4px;
+    column-gap: 8px;
+  }
+  .subtask-list .task > *{ min-width: 0; }
+  .subtask-list .task input[type="checkbox"]{ grid-area: chk; }
+  .subtask-list .task .xp{ grid-area: xp; }
+  .subtask-list .task .menuWrap{ grid-area: menu; justify-self: end; }
+  .subtask-list .task .title{
+    grid-area: title;
+    font-size: 0.85rem;
+    min-width: 0 !important;
+    display: block;
+    overflow: visible;
+    text-overflow: clip;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    margin-top: 2px;
+  }
+  /* Ensure subtask text itself is not clamped in stacked layout */
+  .subtask-list .task .title-main{
+    display: block;
+    overflow: visible;
+    text-overflow: clip;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}

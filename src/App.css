@@ -1,0 +1,47 @@
+/* App.css — minimal mobile helpers */
+
+/* ⚠️ حذف استایل‌های قدیمی #root که با لایه‌بندی تداخل داشت
+   (max-width/padding/text-align) — عمداً دیگر وجود ندارد */
+
+/* جلوگیری از زوم ناخواسته Safari روی iOS هنگام فوکوس روی فرم‌ کنترل‌ها */
+.is-ios input,
+.is-ios textarea,
+.is-ios select { font-size: 16px; }
+
+/* تاچ‌تارگت استاندارد در دستگاه‌های لمسی */
+.is-touch button,
+.is-touch .btn,
+.is-touch .icon-btn,
+.is-touch .icon,
+.is-touch [data-role="closer"] {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.is-touch input[type="checkbox"] { width: 22px; height: 22px; }
+
+/* اگر در برخی جاها از این دو کلاس استفاده می‌کنی، حفظ‌شان بدرد می‌خورد */
+.tap-ctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.chk-ctrl {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+}
+.chk-ctrl.on.on-green { background: #10b981; }
+.chk-ctrl.on.on-blue  { background: #3b82f6; }
+.chk-ctrl.on.on-amber { background: #f59e0b; }
+
+/* روی لمسی کمی بزرگ‌تر */
+.is-touch .tap-ctl { min-width: 44px; min-height: 44px; padding: 8px; }
+.is-touch .chk-ctrl { width: 28px; height: 28px; }
+.is-touch .tabbar { height: 56px; } /* در صورت وجود تب‌بار پایین */

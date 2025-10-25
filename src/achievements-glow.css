@@ -1,0 +1,126 @@
+/* Achievement Pill Glow Effects */
+.ach-pill {
+  transition: box-shadow 0.3s ease;
+}
+
+/* Default/Generic - Golden Glow */
+.ach-pill[data-ach-type="generic"],
+.ach-pill[data-ach-type="productivity"],
+.ach-pill[data-ach-type="meta"],
+.ach-pill[data-ach-type="time"],
+.ach-pill[data-ach-type="evergreen"],
+.ach-pill[data-ach-type="weekly"] {
+  box-shadow: 
+    0 0 8px rgba(255, 215, 0, 0.4),
+    0 0 16px rgba(255, 215, 0, 0.3),
+    0 0 24px rgba(255, 215, 0, 0.2);
+}
+
+/* WISDOM - Purple/Blue (based on image) */
+.ach-pill[data-ach-type="learning"],
+.ach-pill[data-ach-type="wisdom"] {
+  box-shadow: 
+    0 0 8px rgba(139, 92, 246, 0.5),
+    0 0 16px rgba(139, 92, 246, 0.35),
+    0 0 24px rgba(139, 92, 246, 0.2);
+}
+
+/* HEALTH - Green */
+.ach-pill[data-ach-type="health"] {
+  box-shadow: 
+    0 0 8px rgba(34, 197, 94, 0.5),
+    0 0 16px rgba(34, 197, 94, 0.35),
+    0 0 24px rgba(34, 197, 94, 0.2);
+}
+
+/* STRENGTH - Red/Orange */
+.ach-pill[data-ach-type="strength"] {
+  box-shadow: 
+    0 0 8px rgba(239, 68, 68, 0.5),
+    0 0 16px rgba(239, 68, 68, 0.35),
+    0 0 24px rgba(239, 68, 68, 0.2);
+}
+
+/* SOCIAL - Orange/Yellow (based on image) */
+.ach-pill[data-ach-type="social"] {
+  box-shadow: 
+    0 0 8px rgba(251, 146, 60, 0.5),
+    0 0 16px rgba(251, 146, 60, 0.35),
+    0 0 24px rgba(251, 146, 60, 0.2);
+}
+
+/* TRADE - Cyan/Teal */
+.ach-pill[data-ach-type="trade"] {
+  box-shadow: 
+    0 0 8px rgba(6, 182, 212, 0.5),
+    0 0 16px rgba(6, 182, 212, 0.35),
+    0 0 24px rgba(6, 182, 212, 0.2);
+}
+
+/* ATHLETICS - Green/Teal (based on image) */
+.ach-pill[data-ach-type="athletics"] {
+  box-shadow: 
+    0 0 8px rgba(16, 185, 129, 0.5),
+    0 0 16px rgba(16, 185, 129, 0.35),
+    0 0 24px rgba(16, 185, 129, 0.2);
+}
+
+/* Hover effect - intensify glow */
+.ach-pill:hover {
+  transform: translateY(-2px);
+}
+
+.ach-pill[data-ach-type="generic"]:hover,
+.ach-pill[data-ach-type="productivity"]:hover,
+.ach-pill[data-ach-type="meta"]:hover,
+.ach-pill[data-ach-type="time"]:hover,
+.ach-pill[data-ach-type="evergreen"]:hover,
+.ach-pill[data-ach-type="weekly"]:hover {
+  box-shadow: 
+    0 0 12px rgba(255, 215, 0, 0.6),
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 32px rgba(255, 215, 0, 0.3);
+}
+
+.ach-pill[data-ach-type="learning"]:hover,
+.ach-pill[data-ach-type="wisdom"]:hover {
+  box-shadow: 
+    0 0 12px rgba(139, 92, 246, 0.7),
+    0 0 20px rgba(139, 92, 246, 0.5),
+    0 0 32px rgba(139, 92, 246, 0.3);
+}
+
+.ach-pill[data-ach-type="health"]:hover {
+  box-shadow: 
+    0 0 12px rgba(34, 197, 94, 0.7),
+    0 0 20px rgba(34, 197, 94, 0.5),
+    0 0 32px rgba(34, 197, 94, 0.3);
+}
+
+.ach-pill[data-ach-type="strength"]:hover {
+  box-shadow: 
+    0 0 12px rgba(239, 68, 68, 0.7),
+    0 0 20px rgba(239, 68, 68, 0.5),
+    0 0 32px rgba(239, 68, 68, 0.3);
+}
+
+.ach-pill[data-ach-type="social"]:hover {
+  box-shadow: 
+    0 0 12px rgba(251, 146, 60, 0.7),
+    0 0 20px rgba(251, 146, 60, 0.5),
+    0 0 32px rgba(251, 146, 60, 0.3);
+}
+
+.ach-pill[data-ach-type="trade"]:hover {
+  box-shadow: 
+    0 0 12px rgba(6, 182, 212, 0.7),
+    0 0 20px rgba(6, 182, 212, 0.5),
+    0 0 32px rgba(6, 182, 212, 0.3);
+}
+
+.ach-pill[data-ach-type="athletics"]:hover {
+  box-shadow: 
+    0 0 12px rgba(16, 185, 129, 0.7),
+    0 0 20px rgba(16, 185, 129, 0.5),
+    0 0 32px rgba(16, 185, 129, 0.3);
+}
