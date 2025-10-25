@@ -1,0 +1,72 @@
+/* src/components/Calendar.css */
+
+.calendar-root { --hour-h: 44px; --col-gap: 8px; --grid-border: var(--border); position: relative; }
+.calendar-header { display:flex; align-items:center; gap:8px; justify-content:space-between; margin:8px 0 12px; flex-wrap:wrap; }
+.calendar-header .left { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.calendar-header .right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.calendar-view-toggle button { padding:6px 10px; }
+
+.week-grid { display:grid; grid-template-columns: 52px repeat(7, 1fr); gap: var(--col-gap); }
+.week-grid .hour-col { color: var(--muted); font-size: 12px; text-align:right; padding-right:6px; }
+.week-grid .day-col { position:relative; border:1px solid var(--grid-border); border-radius:10px; background: var(--card); overflow:hidden; }
+.week-grid .day-col .hours { position:relative; }
+.week-grid .day-col .hour-line { position:absolute; left:0; right:0; height:1px; background: var(--border); opacity:.5; }
+.week-grid .day-col .half-line { position:absolute; left:0; right:0; height:1px; background: var(--border); opacity:.3; }
+.week-grid .day-col .now-line { position:absolute; left:0; right:0; height:2px; background: #22c55e; opacity:.9; }
+
+.allday-row { display:grid; grid-template-columns: 52px repeat(7, 1fr); gap: var(--col-gap); margin-bottom:10px; }
+.allday-row .allday-cell { min-height: 30px; border:1px dashed var(--grid-border); border-radius:10px; background: var(--card); padding:4px; }
+.allday-chip { display:inline-block; padding:2px 6px; margin:2px; border-radius:6px; background: var(--border); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.event { position:absolute; left:2px; right:2px; border-radius:8px; color:#fff; padding:4px 6px; font-size:12px; box-shadow: 0 4px 10px rgba(0,0,0,.18); cursor:grab; user-select:none; }
+.event.done { opacity:.6; text-decoration: line-through; }
+.event .title { font-weight:600; font-size: 12px; }
+.event .time { font-size:11px; opacity:.9; }
+.event .handle { position:absolute; left:0; right:0; height:6px; cursor:ns-resize; }
+.event .handle.top { top:-2px; }
+.event .handle.bot { bottom:-2px; }
+
+.calendar-month { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
+.calendar-month .cell { min-height: 100px; border:1px solid var(--grid-border); border-radius:10px; background: var(--card); padding:6px; position:relative; }
+.calendar-month .cell .date { position:absolute; top:6px; right:8px; font-size:11px; color: var(--muted); }
+
+.calendar-empty { color: var(--muted); font-size: 14px; padding: 10px; }
+
+/* Inline mini-composer */
+.cc-editor {
+  position:absolute;
+  z-index:50;
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.18);
+  width: min(320px, 92vw);
+}
+.cc-editor .cc-title {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg, var(--card));
+}
+.cc-editor .cc-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cc-editor .cc-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; }
+.cc-editor .cc-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+.cc-editor .chip { padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: var(--card); cursor:pointer; font-size:12px; color: var(--text); }
+.cc-editor .chip:hover { background: rgba(0,0,0,.05); }
+.cc-editor .btn.primary { background:#605cff; color:#fff; }
+.cc-editor select, .cc-editor input[type="time"], .cc-editor input[type="date"], .cc-editor input[type="datetime-local"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg, var(--card));
+}
+.cc-colors { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.cc-color { width: 18px; height: 18px; border-radius: 999px; border:2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); cursor:pointer; }
+.cc-color.sel { outline: 2px solid #2b2b2b; }

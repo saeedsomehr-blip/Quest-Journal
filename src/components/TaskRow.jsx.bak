@@ -1,0 +1,275 @@
+import React, { useState, useMemo } from "react";
+import { epicifyTask } from "../utils/ai.js";
+import { QUEST_TYPES } from "../core/constants.js";
+
+function percentMilestones(task) {
+  const subs = Array.isArray(task?.subtasks) ? task.subtasks : [];
+  const totalW = subs
+    .filter((s) => s?.isMilestone)
+    .reduce((a, s) => a + Math.max(0, Number(s.milestoneWeight) || 0), 0);
+  const doneW = subs
+    .filter((s) => s?.isMilestone && s.done)
+    .reduce((a, s) => a + Math.max(0, Number(s.milestoneWeight) || 0), 0);
+  if (totalW <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round((doneW / totalW) * 100)));
+}
+
+export default function TaskRow({
+  t,
+  childrenOf,
+  onToggle,
+  onRemove,
+  onAddSubtask,
+  onMilestoneToggle,
+  onUpdate,
+  timeLeft,
+  lastBoost,
+}) {
+  const kids = childrenOf(t.id);
+  const [addingSub, setAddingSub] = useState(false);
+  const [newSubTitle, setNewSubTitle] = useState("");
+  // Subtask XP now computed from parent XP via percentage; no free numeric input
+  const [liveDesc, setLiveDesc] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  const deadlineText = t.done ? null : timeLeft(t.deadline);
+  const questTypeKey = ((t?.questType ?? "BASIC").toString().toUpperCase());
+  const q = QUEST_TYPES[questTypeKey] || QUEST_TYPES.BASIC;
+
+  const pct = useMemo(() => percentMilestones(t), [t?.subtasks]);
+  const milestones = useMemo(
+    () => (Array.isArray(t?.subtasks) ? t.subtasks.filter((s) => s?.isMilestone) : []),
+    [t?.subtasks]
+  );
+
+  async function aiForThis() {
+    try {
+      setIsStreaming(true);
+      let final = "";
+      await epicifyTask(t.title, t.desc || "", {
+        stream: true,
+        onToken: (_tok, full) => {
+          setLiveDesc(full);
+          final = full;
+        },
+      });
+      onUpdate?.(t.id, { desc: final });
+    } catch (e) {
+      alert("AI failed: " + e.message);
+    } finally { setIsStreaming(false); }
+  }
+
+  function submitNewSub() {
+    const title = newSubTitle.trim();
+    if (!title) return;
+    // Ask for importance percentage (0-200)
+    let pctStr = prompt("این ساب‌تسک، چند درصد از تسک اصلی مهمه؟ (۰ تا ۲۰۰)", "10");
+    if (pctStr == null) return; // cancelled
+    const pct = Math.max(0, Math.min(200, parseInt(pctStr, 10) || 0));
+    onAddSubtask(t.id, title, pct, () => {
+      setAddingSub(false);
+      setNewSubTitle("");
+    });
+  }
+
+  const canEdit = !t.done;
+
+  return (
+    <div className={`task ${t.done ? "done" : ""} ${addingSub ? "adding-sub" : ""}`}>
+      <input
+        type="checkbox"
+        checked={t.done}
+        onChange={() => onToggle(t.id)}
+        aria-label="Toggle task done"
+      />
+
+      <div className="title" onClick={() => onUpdate?.(t)}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: 120 }}>{t.title}</div>
+          <span className="badge" title="Quest type" style={{ whiteSpace: "nowrap" }}>
+            {q.label}
+          </span>
+        </div>
+
+        <div className="hint" style={{ marginTop: 4 }}>
+          {(isStreaming || liveDesc) ? (
+            <div>{liveDesc}</div>
+          ) : (
+            t.desc && <div>{t.desc}</div>
+          )}
+
+          {/* ⛔️ قبلاً اینجا ریزِ XP شاخه‌ها رندر می‌شد که حذف شد */}
+
+          {["MAIN", "EPIC"].includes(questTypeKey) && (
+            <span
+              className="hint"
+              title="Milestone progress"
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 6 }}
+            >
+              <progress className="bar" max={100} value={pct}></progress>
+              <span className="mono">{pct}%</span>
+            </span>
+          )}
+
+          {milestones.length > 0 && (
+            <div className="milestone-list" style={{ marginTop: 6 }}>
+              {milestones.map((m, idx) => {
+                const weight = Math.max(0, Number(m?.milestoneWeight) || 0);
+                const fallbackId = m?.id || String(idx);
+                const isChecked = !!m?.done;
+                const isDisabled = isChecked || !canEdit;
+                return (
+                  <label
+                    key={m?.id || `milestone-${idx}`}
+                    className={`milestone-item ${isChecked ? "done" : ""}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      disabled={isDisabled}
+                      onChange={() => {
+                        if (!isDisabled) onMilestoneToggle?.(t.id, fallbackId);
+                      }}
+                    />
+                    <span className="milestone-title">
+                      {m?.title || `Milestone ${idx + 1}`}
+                    </span>
+                    {weight > 0 && (
+                      <span className="milestone-weight mono">{weight}%</span>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {!!lastBoost && (
+            <span className="hint" style={{ marginLeft: 8 }}>
+              +Boost from subtasks: <b className="mono">+{lastBoost}</b>
+            </span>
+          )}
+
+          {deadlineText && (
+            <div
+              className={`deadline ${deadlineText.startsWith("Overdue") ? "overdue" : ""}`}
+            >
+              {deadlineText}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="xp mono">{t.xp} XP</div>
+
+      <div style={{ display: "flex", gap: 6 }}>
+        <button
+          className="btn"
+          onClick={aiForThis}
+          title="Generate epic story"
+          disabled={!canEdit}
+          type="button"
+        >
+          ✨ AI
+        </button>
+        <button
+          className="btn"
+          onClick={() => setAddingSub(true)}
+          disabled={!canEdit}
+          type="button"
+        >
+          + Sub
+        </button>
+        <button
+          className="btn icon-btn"
+          onClick={() => onRemove(t.id)}
+          aria-label="Delete"
+          type="button"
+        >
+          🗑️
+        </button>
+      </div>
+
+      {addingSub ? (
+        <div className="subtask-add" style={{ display: "flex", gap: 6, marginTop: 8 }}>
+          <input
+            className="text-input"
+            autoFocus
+            placeholder="Subtask title…"
+            value={newSubTitle}
+            onChange={(e) => setNewSubTitle(e.target.value)}
+            onFocus={(e) => { try { e.target.scrollIntoView({ block: 'nearest' }); } catch {} }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") submitNewSub();
+            }}
+            aria-label="Subtask title"
+          />
+          <button className="btn" onClick={submitNewSub} type="button">
+            Add
+          </button>
+          <button
+            className="btn"
+            onClick={() => {
+              setAddingSub(false);
+              setNewSubTitle("");
+            }}
+            type="button"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <>
+          {kids?.length > 0 && (
+            <div
+              className="subtask-list"
+              style={{ gridColumn: "1 / -1", display: "grid", gap: 8, marginTop: 8 }}
+            >
+              {kids.map((c) => {
+                const childCanEdit = !c.done;
+                return (
+                  <div
+                    key={c.id}
+                    className={`task ${c.done ? "done" : ""}`}
+                    style={{ marginLeft: 16 }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={c.done}
+                      onChange={() => onToggle(c.id)}
+                      aria-label="Toggle subtask done"
+                    />
+                    <div className="title">
+                      <div>{c.title}</div>
+                      {c.desc && (
+                        <div className="hint" style={{ marginTop: 4 }}>
+                          {c.desc}
+                        </div>
+                      )}
+                    </div>
+                    <div className="xp mono">{c.xp} XP</div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {false && (
+                        <button className="btn" type="button" disabled>
+                          ✨ AI
+                        </button>
+                      )}
+                      <button
+                        className="btn icon-btn"
+                        onClick={() => onRemove(c.id)}
+                        aria-label="Delete child"
+                        type="button"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
