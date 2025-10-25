@@ -1,0 +1,106 @@
+{
+  "name": "quest-journal",
+  "private": true,
+  "version": "1.2.0",
+  "description": "Quest Journal — desktop app (Electron + Vite + React)",
+  "author": "You",
+  "license": "MIT",
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "electron .",
+    "build:desktop": "vite build && electron-builder",
+    "build:portable": "vite build && electron-builder -w portable",
+    "build:dir": "vite build && electron-builder -w dir",
+    "ai-proxy": "node --env-file=.env server/ai-proxy.mjs",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@dotlottie/player-component": "^2.7.12",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "firebase": "^12.4.0",
+    "global-agent": "^3.0.0",
+    "lottie-react": "^2.4.1",
+    "node-fetch": "^3.3.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-joyride": "^2.9.3",
+    "serve-handler": "^6.1.6"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/core": "^6.2.1",
+    "@eslint/js": "^9.33.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "electron": "^32.3.3",
+    "electron-builder": "^24.13.3",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "tslib": "^2.8.1",
+    "vite": "^7.1.9"
+  },
+  "build": {
+    "appId": "com.questjournal.app",
+    "productName": "Quest Journal",
+    "compression": "maximum",
+    "asar": true,
+    "files": [
+      "dist/**/*",
+      "electron/**",
+      "public/assets/**/*",
+      "server/**/*",
+      "!node_modules/.cache",
+      "!.env*"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "server/",
+        "to": "server",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "artifactName": "QuestJournal-${version}-${os}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "QuestJournal-Portable-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": "never"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:react-hooks/recommended"
+    ],
+    "env": {
+      "browser": true,
+      "es2022": true,
+      "node": true
+    }
+  }
+}

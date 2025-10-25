@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- Prevent zooming out below initial size on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#eef2ff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0d1220" media="(prefers-color-scheme: dark)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=IM+Fell+DW+Pica+SC&family=Special+Elite&family=Lobster&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    <title>Quest Journal</title>
+    <script>
+      (function () {
+        var doc = document.documentElement;
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (isIOS) doc.classList.add('is-ios');
+
+        var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouch) doc.classList.add('is-touch');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
